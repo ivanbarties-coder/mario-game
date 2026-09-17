@@ -42,7 +42,9 @@ Progress persists to `localStorage` under a versioned key. A save is written whe
 
 ## Legal
 
-An original implementation written from scratch as a homage to the 1985 platformer that inspired it. Contains no Nintendo code, artwork, audio, or other assets. Mario and Super Mario Bros. are trademarks of Nintendo; this project is unaffiliated with and unendorsed by Nintendo.
+A non-commercial fan homage to the 1985 platformer that inspired it, written from scratch. All code, level design, and music are original work — no Nintendo code, files, or recordings were used, and the soundtrack is an original composition rather than a transcription. The character sprites are hand-drawn pixel art, but they are deliberate stylistic homages and visually resemble characters from the original.
+
+Mario, Super Mario Bros., and the associated characters are trademarks of Nintendo. This project is unaffiliated with, unendorsed by, and not approved by Nintendo.
 
 ## License
 
