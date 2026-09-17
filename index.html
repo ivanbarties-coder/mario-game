@@ -231,7 +231,7 @@ function audio(){
     try {
       actx = new (window.AudioContext || window.webkitAudioContext)();
       masterG = actx.createGain(); masterG.gain.value = muted ? 0 : 1; masterG.connect(actx.destination);
-      musicG  = actx.createGain(); musicG.gain.value = 0.55; musicG.connect(masterG);
+      musicG  = actx.createGain(); musicG.gain.value = 0.85; musicG.connect(masterG);
       sfxG    = actx.createGain(); sfxG.gain.value = 1;      sfxG.connect(masterG);
       const n = Math.floor(actx.sampleRate * 0.5);
       noiseBuf = actx.createBuffer(1, n, actx.sampleRate);
@@ -296,7 +296,7 @@ function noteHz(n){
   if(!m) return 0;
   return 440 * Math.pow(2, ((+m[3] + 1) * 12 + SEMI[m[1]] + (m[2] ? 1 : 0) - 69) / 12);
 }
-const MSTEP = 0.2;
+const MSTEP = 0.15;   // ~100 BPM in eighths - brisk enough to carry a run
 function parseTrack(str){
   const tk = str.trim().split(/\s+/), out = new Array(tk.length).fill(null);
   for(let i=0;i<tk.length;i++){
@@ -307,17 +307,18 @@ function parseTrack(str){
   }
   return out;
 }
+// Eight bars, eight steps each. Chords: C | Am | F | G | C | F | G | C
 const LEAD = parseTrack(
-  'C5 D5 E5 G5 E5 .  D5 .   C5 .  .  -  G4 A4 B4 .   C5 E5 G5 C6 B5 .  A5 .   G5 .  .  -  E5 F5 G5 .  ' +
-  'A5 .  G5 .  F5 .  E5 .   D5 .  E5 F5 E5 .  D5 .   C5 E5 D5 F5 E5 G5 F5 A5  G5 .  .  .  -  -  -  - ');
+  'C5 E5 G5 E5 C6 .  B5 .   A5 G5 E5 .  D5 .  -  .   D5 F5 A5 F5 C6 .  A5 .   G5 F5 D5 .  C5 .  -  .  ' +
+  'E5 G5 C6 .  B5 A5 G5 E5  F5 A5 C6 .  A5 G5 F5 D5  G5 .  E5 .  C5 .  D5 E5  C5 .  .  .  -  -  -  - ');
 const HARM = parseTrack(
-  'E4 F4 G4 B4 G4 .  F4 .   E4 .  .  -  E4 F4 G4 .   E4 G4 B4 E5 G5 .  F5 .   E5 .  .  -  C5 D5 E5 .  ' +
-  'F5 .  E5 .  D5 .  C5 .   B4 .  C5 D5 C5 .  B4 .   E4 G4 F4 A4 G4 B4 A4 C5  E4 .  .  .  -  -  -  - ');
+  'E4 G4 C5 G4 E5 .  D5 .   C5 B4 G4 .  F4 .  -  .   F4 A4 D5 A4 E5 .  C5 .   B4 A4 F4 .  E4 .  -  .  ' +
+  'G4 C5 E5 .  D5 C5 B4 G4  A4 C5 E5 .  C5 B4 A4 F4  B4 .  G4 .  E4 .  F4 G4  E4 .  .  .  -  -  -  - ');
 const BASS = parseTrack(
-  'C3 -  C3 -  G2 -  G2 -   C3 -  C3 -  G2 -  B2 -   C3 -  C3 -  E3 -  E3 -   C3 -  C3 -  G2 -  G2 -  ' +
-  'F2 -  F2 -  D3 -  D3 -   G2 -  G2 -  B2 -  B2 -   C3 -  A2 -  F2 -  G2 -   C3 -  G2 -  C3 -  -  - ');
+  'C3 -  G2 -  C3 -  E3 -   A2 -  E2 -  A2 -  C3 -   F2 -  C3 -  F2 -  A2 -   G2 -  D3 -  G2 -  B2 -  ' +
+  'C3 -  G2 -  C3 -  E3 -   F2 -  C3 -  F2 -  A2 -   G2 -  B2 -  D3 -  G2 -   C3 -  -  -  C3 -  -  - ');
 const PERC = ('K H S H K H S H  K H S H K H S H  K H S H K H S H  K H S H K H S H  ' +
-              'K H S H K H S H  K H S H K H S H  K H S H K H S H  K H S H K S S S').trim().split(/\s+/);
+              'K H S H K H S H  K H S H K H S H  K H S H K H S H  K H S H K S K S').trim().split(/\s+/);
 const MLEN = LEAD.length;
 
 let musicOn = false, mStep = 0, mNext = 0, mTimer = null;
@@ -355,9 +356,9 @@ function musicTick(){
   if(!actx || !musicOn) return;
   while(mNext < actx.currentTime + 0.25){
     const i = mStep % MLEN;
-    const L = LEAD[i]; if(L) mNote(L.f, mNext, L.d * 0.9, 'square', 0.075);
-    const H = HARM[i]; if(H) mNote(H.f, mNext, H.d * 0.9, 'square', 0.032);
-    const B = BASS[i]; if(B) mNote(B.f, mNext, B.d * 0.9, 'triangle', 0.11);
+    const L = LEAD[i]; if(L) mNote(L.f, mNext, L.d * 0.9, 'square',   0.105);
+    const H = HARM[i]; if(H) mNote(H.f, mNext, H.d * 0.9, 'square',   0.050);
+    const B = BASS[i]; if(B) mNote(B.f, mNext, B.d * 0.9, 'triangle', 0.130);
     const P = PERC[i]; if(P && P !== '-') mPerc(P, mNext);
     mStep++; mNext += MSTEP;
   }

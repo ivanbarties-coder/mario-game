@@ -64,6 +64,8 @@ const EXPORTS = `
     solidAt: solidAt, update: update, saveGame: saveGame, readSave: readSave,
     clearSave: clearSave, newGame: newGame, continueGame: continueGame,
     loadLevel: loadLevel, SAVE_KEY: SAVE_KEY,
+    tracks: { LEAD: LEAD, HARM: HARM, BASS: BASS, PERC: PERC }, MLEN: MLEN,
+    noteHz: noteHz,
   };
 `;
 // Inject the export just INSIDE the game's closing IIFE, don't remove it.
@@ -137,6 +139,20 @@ ok(A.readSave() !== null, 'crossing a checkpoint writes a save');
 A.player.x = A.CHECKPOINTS[3] * A.TILE + 8;
 A.update();
 ok(A.checkpoint === 3, 'skipping ahead advances past intermediate checkpoints');
+
+console.log('\n--- music tracks ---');
+// Misaligned tracks desync the voices silently, so pin the lengths.
+for (const n of Object.keys(A.tracks)) {
+  ok(A.tracks[n].length === A.MLEN,
+     n + ' is ' + A.tracks[n].length + ' steps, matching MLEN=' + A.MLEN);
+}
+for (const n of ['LEAD', 'HARM', 'BASS']) {
+  const bad = A.tracks[n].filter(v => v && (!isFinite(v.f) || v.f <= 0));
+  ok(bad.length === 0, n + ' has no unparseable notes (a typo yields f=0 = silence)');
+}
+ok(A.tracks.PERC.every(t => ['K', 'S', 'H', '-', '.'].includes(t)),
+   'PERC uses only known drum tokens');
+ok(Math.abs(A.noteHz('A4') - 440) < 0.01, 'noteHz is in tune (A4 = 440Hz)');
 
 console.log('\n--- sim stability ---');
 A.newGame();
