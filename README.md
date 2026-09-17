@@ -2,7 +2,9 @@
 
 A side-scrolling platformer in a single HTML file. No dependencies, no build step, no assets — every sprite is drawn from a pixel map defined in the source, and all sound is synthesized at runtime with the Web Audio API.
 
-Open `index.html` in any modern browser, or play the hosted version on GitHub Pages.
+### ▶ [Play it here](https://ivanbarties-coder.github.io/mario-game/)
+
+Or clone the repo and open `index.html` directly in any modern browser — there is nothing to install and nothing to build.
 
 ## Controls
 
