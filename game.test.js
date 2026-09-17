@@ -79,8 +79,8 @@ const ok = (c, m) => { console.log((c ? '  PASS  ' : '  FAIL  ') + m); if (!c) f
 
 console.log('--- boot ---');
 ok(A.state === 'play', 'game boots into play state');
-ok(A.START_LIVES === 100, 'START_LIVES is 100');
-ok(A.lives === 100, 'fresh game starts with 100 lives (got ' + A.lives + ')');
+ok(A.START_LIVES === 3, 'START_LIVES is 3 (got ' + A.START_LIVES + ')');
+ok(A.lives === A.START_LIVES, 'fresh game starts with START_LIVES lives (got ' + A.lives + ')');
 
 console.log('\n--- checkpoints are on solid ground ---');
 for (let i = 0; i < A.CHECKPOINTS.length; i++) {
@@ -120,7 +120,11 @@ store.set(A.SAVE_KEY, 'not json at all');
 ok(A.readSave() === null, 'malformed JSON rejected');
 store.set(A.SAVE_KEY, JSON.stringify({ v: 99, score: 1, lives: 1 }));
 ok(A.readSave() === null, 'wrong schema version rejected');
-store.set(A.SAVE_KEY, JSON.stringify({ v: 1, score: -5, lives: -3, coins: 999, checkpoint: 77 }));
+// A v1 save is a stale 100-life one; it must not survive the version bump.
+store.set(A.SAVE_KEY, JSON.stringify({ v: 1, score: 5000, lives: 100, checkpoint: 1 }));
+ok(A.readSave() === null, 'stale v1 save (100 lives) is discarded, not carried over');
+
+store.set(A.SAVE_KEY, JSON.stringify({ v: 2, score: -5, lives: -3, coins: 999, checkpoint: 77 }));
 const t = A.readSave();
 ok(t && t.lives >= 1, 'negative lives clamped up (' + (t && t.lives) + ')');
 ok(t && t.score >= 0, 'negative score clamped to 0 (' + (t && t.score) + ')');

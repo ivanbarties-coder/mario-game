@@ -413,12 +413,12 @@ canvas.addEventListener('pointerdown', audio);
 
 /* ---------- game state ---------- */
 let state, paused = false, frame = 0, camX = 0;
-const START_LIVES = 100;
+const START_LIVES = 3;
 let score = 0, coins = 0, lives = START_LIVES, timeLeft = 400, timeTick = 0, stateTimer = 0;
 let player, ents, parts, bumps;
 
 /* ---------- progress saving ---------- */
-const SAVE_KEY = 'superplumber.save.v1';
+const SAVE_KEY = 'superplumber.save.v2';
 // Respawn columns, all chosen clear of the pits (69-70, 86-87, 153-154),
 // the pipes (28, 38, 46, 57, 176) and the end staircase.
 const CHECKPOINTS = [3, 62, 110, 162];
@@ -428,7 +428,7 @@ let saveFlash = 0;    // frames left on the "progress saved" toast
 function saveGame(){
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify({
-      v: 1, score: score, coins: coins, lives: lives,
+      v: 2, score: score, coins: coins, lives: lives,
       checkpoint: checkpoint, big: player ? !!player.big : false
     }));
     saveFlash = 96;
@@ -437,7 +437,7 @@ function saveGame(){
 function readSave(){
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-    if(!s || s.v !== 1) return null;
+    if(!s || s.v !== 2) return null;
     // Clamp everything: the save is user-editable and a bad value here would
     // spawn the player inside a wall or hand them a negative life count.
     if(typeof s.score !== 'number' || typeof s.lives !== 'number') return null;
